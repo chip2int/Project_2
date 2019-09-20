@@ -41,12 +41,33 @@ function sfDis(sfData, csv) {
   // Give each feature a popup describing the place and time of the earthquake
 
   function sfDis1(feature, layer) {
-    csv.forEach(v => {
-       layer.bindPopup(
-        "<h3> Over 65: " + v.Over65_Per + "</h3>" + 
-        "<h3> Over 85: " + v.Over85_Per + "</h3>"
-        )
-     })
+    for (i = 1; i < csv.length; ++i) {
+      var row = csv[i];
+
+      if (row.Field === feature.properties.nhood) {
+        console.log("Row", row)
+        // layer.bindPopup(
+        //   "<h4> Area: " + row.Field + "</h4>" +
+        //   "<h4> Over 65: " + row.Over65_Per + "</h4>" +
+        //   "<h4> Over 85: " + row.Over85_Per + "</h4>" +
+        //   "<h4> Under 18: " + row.Under18_Per + "</h4>" +
+        //   "<h4> Under 5: " + row.Under5_Per + "</h4>" +
+        //   "<h4> Hazard Risk Score: " + row.Haz_Score + "</h4>"
+        //  );
+
+        let str = "<p>"
+        str += "Area: " + row.Field + "</br>"
+        str += "Over 65: " + row.Over65_Per + "</br>"
+        str += "Over 85: " + row.Over85_Per + "</br>" 
+        str += "Under 18: " + row.Under18_Per + "</br>" 
+        str += "Under 5: " + row.Under5_Per + "</br>"
+        str += "Hazard Risk Score: " + row.Haz_Score + "</br>"
+        str += "</p>"
+        layer.bindPopup(str)
+          
+        break;
+      }
+    }
   }
 
   // Create a GeoJSON layer containing the features array on the earthquakeData object
