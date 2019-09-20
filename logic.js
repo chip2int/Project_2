@@ -1,21 +1,17 @@
 // Store our API endpoint inside queryUrl
-var queryUrl = "sf1.geoJSON";
-var sfdisurl = "sfdis.geoJSON";
-var sfpop = "hood.csv"
+var queryUrl = "./data/sf1.geoJSON";
+var sfdisurl = "./data/sfdis.geoJSON";
+var sfpop = "./data/hood_new.csv"
+
 
 // Perform a GET request to the query URL
 d3.json(queryUrl, function(data) {
   // Once we get a response, send the data.features object to the createFeatures function
   var earth = createFeatures(data.features);
-
   d3.csv(sfpop, function(csv) {
-
-  d3.json(sfdisurl, function(data) {
-// console.log(csv)
-  var sfwhatever = sfDis(data.features, csv);
-
- createMap(earth, sfwhatever)
-
+    d3.json(sfdisurl, function(data) {
+      var sfwhatever = sfDis(data.features, csv);
+        createMap(earth, sfwhatever)
         });
     });
 });
@@ -43,14 +39,14 @@ function sfDis(sfData, csv) {
 
   // Define a function we want to run once for each feature in the features array
   // Give each feature a popup describing the place and time of the earthquake
+
   function sfDis1(feature, layer) {
-    console.log(csv)
-    // csv.filter
-    var csvData = csv.filter(data => data["Indicator Categoy"].trim() == feature.properties.nhood.trim())
-    console.log(csvData)
-    layer.bindPopup("<h3>" + feature.properties.nhood +
-      // "</h3><hr><p>" + new Date(feature.properties.nhood) + "</p>");
-      "</h3><hr><p>" + csvData[0].Demographics + "</p>");
+    csv.forEach(v => {
+       layer.bindPopup(
+        "<h3> Over 65: " + v.Over65_Per + "</h3>" + 
+        "<h3> Over 85: " + v.Over85_Per + "</h3>"
+        )
+     })
   }
 
   // Create a GeoJSON layer containing the features array on the earthquakeData object
