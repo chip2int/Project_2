@@ -48,10 +48,10 @@ function sfDis(sfData, csv) {
       if (row.Field === feature.properties.nhood) {
         let str = "<h4> Area: " + row.Field + "</h4><hr>"
         str += "<p>"
-        str += "Over 65: " + row.Over65_Per + "</br>"
-        str += "Over 85: " + row.Over85_Per + "</br>" 
-        str += "Under 18: " + row.Under18_Per + "</br>" 
-        str += "Under 5: " + row.Under5_Per + "</br>"
+        str += "Over 65: " + `${(row.Over65_Per * 100).toFixed(2)} %` + "</br>"
+        str += "Over 85: " + `${(row.Over85_Per * 100).toFixed(2)} %`+ "</br>" 
+        str += "Under 18: " +  `${(row.Under18_Per * 100).toFixed(2)} %`+ "</br>" 
+        str += "Under 5: " +  `${(row.Under5_Per * 100).toFixed(2)} %` + "</br>"
         str += "Hazard Risk Score: " + row.Haz_Score + "</br>"
         str += "</p>"
         layer.bindPopup(str)
