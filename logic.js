@@ -1,50 +1,30 @@
-// Store our API endpoint inside queryUrl
-var queryUrl = "./data/sf1.geoJSON";
-var sfdisurl = "./data/sfdis.geoJSON";
-var sfpop = "./data/hood_new.csv"
+// Store our API endpoint inside liquefactionJSON
+const liquefactionJSON = "./data/sf1.geoJSON";
+const sfAreasJSON = "./data/sfdis.geoJSON";
+const sfPopulation = "./data/hood_new.csv"
 
-
-// Perform a GET request to the query URL
-d3.json(queryUrl, function(data) {
+// Read the JSON files and the cvs data
+d3.json(liquefactionJSON, function(data) {
   // Once we get a response, send the data.features object to the createFeatures function
-  var earth = createFeatures(data.features);
-  d3.csv(sfpop, function(csv) {
-    d3.json(sfdisurl, function(data) {
-      var sfwhatever = sfDis(data.features, csv);
-        createMap(earth, sfwhatever)
-        });
+  const liquefactionFeature = createFeatures(data.features);
+  d3.csv(sfPopulation, function(csv) {
+    d3.json(sfAreasJSON, function(data) {
+        createMap(liquefactionFeature, createAreaPopup(data.features, csv))
     });
+  });
 });
 
-function createFeatures(earthquakeData) {
-
-  // Define a function we want to run once for each feature in the features array
-  // Give each feature a popup describing the place and time of the earthquake
-  function onEachFeature(feature, layer) {
-    layer.bindPopup("<h3>" + feature.properties.place +
-      "</h3><hr><p>" + new Date(feature.properties.time) + "</p>");
-  }
-
-  // Create a GeoJSON layer containing the features array on the earthquakeData object
-  // Run the onEachFeature function once for each piece of data in the array
-  var earthquakes = L.geoJSON(earthquakeData, {
-    onEachFeature: onEachFeature,
+createFeatures = (data) => {
+  // Create a GeoJSON layer containing the features array for the liquefaction data
+  return L.geoJSON(data, {
     weight: 1
   });
-
-  // Sending our earthquakes layer to the createMap function
-  return earthquakes
 }
 
-function sfDis(sfData, csv) {
-
-  // Define a function we want to run once for each feature in the features array
-  // Give each feature a popup describing the place and time of the earthquake
-
-  function sfDis1(feature, layer) {
+createAreaPopup = (sfData, csv) => {
+  createPopulationPopup = (feature, layer) => {
     for (i = 1; i < csv.length; ++i) {
-      var row = csv[i];
-
+      let row = csv[i];
       if (row.Field === feature.properties.nhood) {
         let str = "<h4> Area: " + row.Field + "</h4><hr>"
         str += "<p>"
@@ -55,36 +35,28 @@ function sfDis(sfData, csv) {
         str += "Hazard Risk Score: " + row.Haz_Score + "</br>"
         str += "</p>"
         layer.bindPopup(str)
-          
         break;
       }
     }
   }
-
   // Create a GeoJSON layer containing the features array on the earthquakeData object
   // Run the onEachFeature function once for each piece of data in the array
-  var sf = L.geoJSON(sfData, {
-    onEachFeature: sfDis1,
+  return L.geoJSON(sfData, {
+    onEachFeature: createPopulationPopup,
     weight: 1,
-    color: 'red'
+    color: 'green'
   });
-
-  // Sending our earthquakes layer to the createMap function
-  return sf
 }
 
-function createMap(earthquakes, sf) {
-
-  // Define streetmap and darkmap layers
-  // console.log(earthquakes)
-  var streetmap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+function createMap(liquefaction, neighborhood) {
+  const streetmap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
     attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
     maxZoom: 18,
     id: "mapbox.streets",
     accessToken: API_KEY
   });
 
-  var darkmap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+  const darkmap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
     attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
     maxZoom: 18,
     id: "mapbox.dark",
@@ -92,29 +64,24 @@ function createMap(earthquakes, sf) {
   });
 
   // Define a baseMaps object to hold our base layers
-  var baseMaps = {
+  const baseMaps = {
     "Street Map": streetmap,
     "Dark Map": darkmap
   };
 
   // Create overlay object to hold our overlay layer
-  var overlayMaps = {
-    Liquefaction: earthquakes, 
-    'SF Neighborhood': sf
+  const overlayMaps = {
+    Liquefaction: liquefaction, 
+    'SF Neighborhood': neighborhood
   };
 
-
-
-  // Create our map, giving it the streetmap and earthquakes layers to display on load
-  var myMap = L.map("map", {
+  // Create our map, giving it the streetmap and liquefaction layers to display on load
+  const myMap = L.map("map", {
     center: [37.7749, -122.4194],
     zoom: 13,
-    layers: [streetmap, earthquakes, sf]
+    layers: [streetmap, liquefaction, neighborhood]
   });
-
-  // Create a layer control
-  // Pass in our baseMaps and overlayMaps
-  // Add the layer control to the map
+  
   L.control.layers(baseMaps, overlayMaps, {
     collapsed: false,
     color: 'yellow'
