@@ -46,18 +46,8 @@ function sfDis(sfData, csv) {
       var row = csv[i];
 
       if (row.Field === feature.properties.nhood) {
-        console.log("Row", row)
-        // layer.bindPopup(
-        //   "<h4> Area: " + row.Field + "</h4>" +
-        //   "<h4> Over 65: " + row.Over65_Per + "</h4>" +
-        //   "<h4> Over 85: " + row.Over85_Per + "</h4>" +
-        //   "<h4> Under 18: " + row.Under18_Per + "</h4>" +
-        //   "<h4> Under 5: " + row.Under5_Per + "</h4>" +
-        //   "<h4> Hazard Risk Score: " + row.Haz_Score + "</h4>"
-        //  );
-
-        let str = "<p>"
-        str += "Area: " + row.Field + "</br>"
+        let str = "<h4> Area: " + row.Field + "</h4><hr>"
+        str += "<p>"
         str += "Over 65: " + row.Over65_Per + "</br>"
         str += "Over 85: " + row.Over85_Per + "</br>" 
         str += "Under 18: " + row.Under18_Per + "</br>" 
@@ -109,7 +99,8 @@ function createMap(earthquakes, sf) {
 
   // Create overlay object to hold our overlay layer
   var overlayMaps = {
-    Earthquakes: earthquakes, sf: sf
+    Liquefaction: earthquakes, 
+    'SF Neighborhood': sf
   };
 
 
