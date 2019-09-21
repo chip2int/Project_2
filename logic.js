@@ -28,7 +28,8 @@ function createFeatures(earthquakeData) {
   // Create a GeoJSON layer containing the features array on the earthquakeData object
   // Run the onEachFeature function once for each piece of data in the array
   var earthquakes = L.geoJSON(earthquakeData, {
-    onEachFeature: onEachFeature
+    onEachFeature: onEachFeature,
+    weight: 1
   });
 
   // Sending our earthquakes layer to the createMap function
@@ -73,7 +74,9 @@ function sfDis(sfData, csv) {
   // Create a GeoJSON layer containing the features array on the earthquakeData object
   // Run the onEachFeature function once for each piece of data in the array
   var sf = L.geoJSON(sfData, {
-    onEachFeature: sfDis1
+    onEachFeature: sfDis1,
+    weight: 1,
+    color: 'red'
   });
 
   // Sending our earthquakes layer to the createMap function
@@ -122,6 +125,7 @@ function createMap(earthquakes, sf) {
   // Pass in our baseMaps and overlayMaps
   // Add the layer control to the map
   L.control.layers(baseMaps, overlayMaps, {
-    collapsed: false
+    collapsed: false,
+    color: 'yellow'
   }).addTo(myMap);
 }
